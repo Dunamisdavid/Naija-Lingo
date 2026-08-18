@@ -12,11 +12,13 @@ datasource db {
 
 model Lesson {
   id           String   @id @default(cuid())
+  language     String
   sceneLabel   String
   context      String
-  phraseKey    String
+  phrase       String
   question     String
   options      String[]
   correctIndex Int
+  order        Int      @default(0)
   createdAt    DateTime @default(now())
 }

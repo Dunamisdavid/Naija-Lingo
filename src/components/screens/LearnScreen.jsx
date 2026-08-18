@@ -3,26 +3,42 @@
 import { useState, useEffect } from "react";
 import { Mic, Check, AlertCircle } from "lucide-react";
 import { LANGS } from "@/data/languages";
+import ListenButton from "@/components/ListenButton";
 
 export default function LearnScreen({ lang }) {
   const l = LANGS[lang];
-  const [lesson, setLesson] = useState(null);
+  const [lessons, setLessons] = useState(null);
+  const [index, setIndex] = useState(0);
   const [error, setError] = useState(null);
   const [answered, setAnswered] = useState(null);
 
-  useEffect(() => {
-    setLesson(null);
+  const loadLessons = () => {
+    setLessons(null);
+    setIndex(0);
     setError(null);
     setAnswered(null);
 
-    fetch("/api/lessons")
+    fetch(`/api/lessons?lang=${lang}`)
       .then((res) => {
         if (!res.ok) throw new Error("Request failed");
         return res.json();
       })
-      .then((data) => setLesson(data[0]))
-      .catch(() => setError("We couldn't load this lesson. Check your connection and try again."));
+      .then((data) => setLessons(data))
+      .catch(() => setError("We couldn't load lessons. Check your connection and try again."));
+  };
+
+  useEffect(() => {
+    loadLessons();
   }, [lang]);
+
+  const lesson = lessons?.[index];
+
+  const handleNext = () => {
+    if (index < lessons.length - 1) {
+      setIndex(index + 1);
+      setAnswered(null);
+    }
+  };
 
   if (error) {
     return (
@@ -30,7 +46,7 @@ export default function LearnScreen({ lang }) {
         <AlertCircle size={28} className="text-[#B4483B] mb-3" />
         <p className="text-[13px] text-[#5C5648] mb-4">{error}</p>
         <button
-          onClick={() => setError(null) || setLesson(undefined)}
+          onClick={loadLessons}
           className="px-4 py-2 rounded-xl text-white text-[13px] font-semibold"
           style={{ background: l.accent }}
         >
@@ -67,9 +83,10 @@ export default function LearnScreen({ lang }) {
       <div className="rounded-[22px] bg-white border border-[#EDE6D6] p-5 space-y-4">
         <p className="text-[13px] text-[#5C5648] leading-relaxed">{lesson.context}</p>
 
-        <div className="rounded-2xl px-4 py-3.5" style={{ background: l.accentSoft }}>
-          <p className="font-display text-[20px] text-[#22231F]">"{l[lesson.phraseKey]}."</p>
-        </div>
+<div className="rounded-2xl px-4 py-3.5 flex items-center justify-between" style={{ background: l.accentSoft }}>
+  <p className="font-display text-[20px] text-[#22231F]">"{lesson.phrase}."</p>
+  <ListenButton text={lesson.phrase} language={lang} accent={l.accent} label="" />
+</div>
 
         <p className="text-[13px] font-semibold text-[#22231F]">{lesson.question}</p>
 
@@ -96,7 +113,7 @@ export default function LearnScreen({ lang }) {
         </div>
       </div>
 
-      {answered === lesson.correctIndex && (
+            {answered === lesson.correctIndex && (
         <div className="rounded-2xl p-4 border" style={{ borderColor: l.accent, background: l.accentSoft }}>
           <p className="text-[12px] font-semibold uppercase tracking-wide mb-1" style={{ color: l.accent }}>
             Your turn
@@ -106,9 +123,19 @@ export default function LearnScreen({ lang }) {
               <Mic size={18} color="white" />
             </div>
             <p className="text-[13px] text-[#22231F]">
-              Say: <span className="font-display font-semibold">"{l[lesson.phraseKey]}."</span>
+              Say: <span className="font-display font-semibold">"{lesson.phrase}."</span>
             </p>
           </div>
+
+          {index < lessons.length - 1 && (
+            <button
+              onClick={handleNext}
+              className="w-full mt-4 py-3 rounded-xl text-white text-[13px] font-semibold"
+              style={{ background: "#1F4D3A" }}
+            >
+              Next lesson
+            </button>
+          )}
         </div>
       )}
     </div>
