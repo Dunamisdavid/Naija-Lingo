@@ -1,37 +1,82 @@
 "use client";
 
-import { useState } from "react";
-import { Mic, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Mic, Check, AlertCircle } from "lucide-react";
 import { LANGS } from "@/data/languages";
-
-const options = ["Good morning", "Good afternoon", "Welcome", "How are you?"];
-const correctIndex = 0;
 
 export default function LearnScreen({ lang }) {
   const l = LANGS[lang];
+  const [lesson, setLesson] = useState(null);
+  const [error, setError] = useState(null);
   const [answered, setAnswered] = useState(null);
+
+  useEffect(() => {
+    setLesson(null);
+    setError(null);
+    setAnswered(null);
+
+    fetch("/api/lessons")
+      .then((res) => {
+        if (!res.ok) throw new Error("Request failed");
+        return res.json();
+      })
+      .then((data) => setLesson(data[0]))
+      .catch(() => setError("We couldn't load this lesson. Check your connection and try again."));
+  }, [lang]);
+
+  if (error) {
+    return (
+      <div className="px-5 pt-10 flex flex-col items-center text-center">
+        <AlertCircle size={28} className="text-[#B4483B] mb-3" />
+        <p className="text-[13px] text-[#5C5648] mb-4">{error}</p>
+        <button
+          onClick={() => setError(null) || setLesson(undefined)}
+          className="px-4 py-2 rounded-xl text-white text-[13px] font-semibold"
+          style={{ background: l.accent }}
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  if (!lesson) {
+    return (
+      <div className="px-5 pt-6 space-y-4">
+        <div className="h-4 w-40 rounded bg-[#EDE6D6] animate-pulse" />
+        <div className="rounded-[22px] bg-white border border-[#EDE6D6] p-5 space-y-4">
+          <div className="h-4 w-full rounded bg-[#EDE6D6] animate-pulse" />
+          <div className="h-14 w-full rounded-2xl bg-[#EDE6D6] animate-pulse" />
+          <div className="h-4 w-32 rounded bg-[#EDE6D6] animate-pulse" />
+          <div className="space-y-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-11 w-full rounded-xl bg-[#EDE6D6] animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-5 pt-4 space-y-4">
       <p className="text-[12px] font-semibold uppercase tracking-wide text-[#8A8478]">
-        Greetings · Scene 3
+        {lesson.sceneLabel}
       </p>
 
       <div className="rounded-[22px] bg-white border border-[#EDE6D6] p-5 space-y-4">
-        <p className="text-[13px] text-[#5C5648] leading-relaxed">
-          You're visiting your grandmother. She looks up and says —
-        </p>
+        <p className="text-[13px] text-[#5C5648] leading-relaxed">{lesson.context}</p>
 
         <div className="rounded-2xl px-4 py-3.5" style={{ background: l.accentSoft }}>
-          <p className="font-display text-[20px] text-[#22231F]">"{l.greet}."</p>
+          <p className="font-display text-[20px] text-[#22231F]">"{l[lesson.phraseKey]}."</p>
         </div>
 
-        <p className="text-[13px] font-semibold text-[#22231F]">What does she mean?</p>
+        <p className="text-[13px] font-semibold text-[#22231F]">{lesson.question}</p>
 
         <div className="space-y-2">
-          {options.map((opt, i) => {
+          {lesson.options.map((opt, i) => {
             const isChosen = answered === i;
-            const isCorrect = i === correctIndex;
+            const isCorrect = i === lesson.correctIndex;
 
             return (
               <button
@@ -51,7 +96,7 @@ export default function LearnScreen({ lang }) {
         </div>
       </div>
 
-      {answered === correctIndex && (
+      {answered === lesson.correctIndex && (
         <div className="rounded-2xl p-4 border" style={{ borderColor: l.accent, background: l.accentSoft }}>
           <p className="text-[12px] font-semibold uppercase tracking-wide mb-1" style={{ color: l.accent }}>
             Your turn
@@ -61,7 +106,7 @@ export default function LearnScreen({ lang }) {
               <Mic size={18} color="white" />
             </div>
             <p className="text-[13px] text-[#22231F]">
-              Say: <span className="font-display font-semibold">"{l.greet}."</span>
+              Say: <span className="font-display font-semibold">"{l[lesson.phraseKey]}."</span>
             </p>
           </div>
         </div>

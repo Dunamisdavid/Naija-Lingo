@@ -11,7 +11,7 @@ export default function LanguageSelector({ lang, onLangChange }) {
           <button
             key={key}
             onClick={() => onLangChange(key)}
-            className="px-3 py-1.5 rounded-full text-[12px] font-semibold border"
+            className="px-3 py-1.5 rounded-full text-[12px] font-semibold border transition-all active:scale-95"
             style={{
               borderColor: active ? LANGS[key].accent : "#EDE6D6",
               background: active ? LANGS[key].accent : "white",

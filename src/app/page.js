@@ -15,15 +15,17 @@ export default function Home() {
 
   return (
     <main className="min-h-screen w-full max-w-[430px] mx-auto bg-[#FAF3E7] pb-20 overflow-x-hidden">
-      <LanguageSelector lang={lang} onLangChange={setLang} />
+  <LanguageSelector lang={lang} onLangChange={setLang} />
 
-      {activeTab === "home" && <HomeScreen lang={lang} />}
-      {activeTab === "learn" && <LearnScreen lang={lang} />}
-      {activeTab === "speak" && <SpeakScreen lang={lang} />}
-      {activeTab === "culture" && <CultureScreen lang={lang} />}
-      {activeTab === "profile" && <ProfileScreen lang={lang} />}
+  <div key={activeTab} className="screen-enter">
+    {activeTab === "home" && <HomeScreen lang={lang} />}
+    {activeTab === "learn" && <LearnScreen lang={lang} />}
+    {activeTab === "speak" && <SpeakScreen lang={lang} />}
+    {activeTab === "culture" && <CultureScreen lang={lang} />}
+    {activeTab === "profile" && <ProfileScreen lang={lang} />}
+  </div>
 
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-    </main>
+  <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+</main>
   );
 }

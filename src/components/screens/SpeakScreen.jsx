@@ -31,7 +31,7 @@ export default function SpeakScreen({ lang }) {
 
       <button
         onClick={handleMicTap}
-        className="relative w-32 h-32 rounded-full flex items-center justify-center mb-4"
+        className="relative w-32 h-32 rounded-full flex items-center justify-center mb-4 transition-transform active:scale-95"
         style={{ background: l.accent }}
       >
         {listening && (
