@@ -1,5 +1,7 @@
-import { Play, Heart, Share2 } from "lucide-react";
+import { Heart, Share2 } from "lucide-react";
 import { LANGS } from "@/data/languages";
+import ListenButton from "@/components/ListenButton";
+import GildedCard from "@/components/GildedCard";
 
 const categories = ["Proverbs", "Names", "Food", "Greetings", "Festivals", "Family", "History", "Stories"];
 
@@ -8,37 +10,50 @@ export default function CultureScreen({ lang }) {
 
   return (
     <div className="px-5 pt-4 space-y-4">
-      <h2 className="font-display text-[19px] text-[#22231F]">Discover {l.label} Culture</h2>
+      <h2 className="font-display text-[19px]" style={{ color: "var(--ink)" }}>Discover {l.label} Culture</h2>
 
-      <div className="rounded-[22px] p-5 bg-[#22231F]">
-        <p className="text-[11px] uppercase tracking-wide font-semibold mb-2" style={{ color: l.accent }}>
+      <GildedCard className="p-6" style={{ background: "var(--emerald)" }}>
+        <p className="text-[10px] font-semibold uppercase mb-2" style={{ color: "var(--gold)", letterSpacing: "0.14em" }}>
           Today's proverb
         </p>
-        <p className="font-display text-[18px] text-white leading-snug mb-3">"{l.proverb}"</p>
-        <p className="text-[12px] text-[#C9C4B6] leading-relaxed mb-4">{l.proverbMeaning}</p>
+        <p className="font-display text-[17px] italic leading-snug mb-3" style={{ color: "var(--canvas)" }}>
+          "{l.proverb}"
+        </p>
+        <p className="text-[12px] leading-relaxed mb-4" style={{ color: "var(--ink-soft)" }}>{l.proverbMeaning}</p>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-1.5 text-[12px] text-white/90"><Play size={13} /> Listen</button>
-          <button className="flex items-center gap-1.5 text-[12px] text-white/90"><Heart size={13} /> Save</button>
-          <button className="flex items-center gap-1.5 text-[12px] text-white/90"><Share2 size={13} /> Share</button>
+          <ListenButton text={l.proverb} language={lang} accent="var(--gold)" label="Listen" />
+          <button className="flex items-center gap-1.5 text-[12px] transition-opacity hover:opacity-70" style={{ color: "var(--canvas)" }}>
+            <Heart size={13} /> Save
+          </button>
+          <button className="flex items-center gap-1.5 text-[12px] transition-opacity hover:opacity-70" style={{ color: "var(--canvas)" }}>
+            <Share2 size={13} /> Share
+          </button>
         </div>
-      </div>
+      </GildedCard>
 
       <div className="grid grid-cols-2 gap-3">
         {categories.map((c) => (
-          <div key={c} className="rounded-xl bg-white border border-[#EDE6D6] px-4 py-3.5 text-[13px] font-semibold text-[#22231F]">
+          <GildedCard
+            key={c}
+            className="px-4 py-3.5 text-[12px] font-semibold cursor-pointer transition-all duration-150 hover:-translate-y-0.5"
+            style={{ color: "var(--ink)" }}
+          >
             {c}
-          </div>
+          </GildedCard>
         ))}
       </div>
 
-      <div className="rounded-2xl p-4 mb-8" style={{ background: l.accentSoft }}>
-        <p className="text-[11px] font-semibold uppercase tracking-wide mb-2" style={{ color: l.accent }}>
-          Word of the day
-        </p>
-        <p className="font-display text-[22px] text-[#22231F]">{l.word}</p>
-        <p className="text-[12px] text-[#5C5648] mb-2">{l.wordMeaning}</p>
-        <p className="text-[12px] text-[#5C5648] italic">{l.wordEx}</p>
-      </div>
+      <GildedCard className="p-4 mb-8">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[10px] font-semibold uppercase" style={{ color: "var(--gold)", letterSpacing: "0.14em" }}>
+            Word of the day
+          </p>
+          <ListenButton text={l.word} language={lang} accent="var(--gold)" label="" />
+        </div>
+        <p className="font-display text-[22px]" style={{ color: "var(--ink)" }}>{l.word}</p>
+        <p className="text-[12px] mb-2" style={{ color: "var(--ink-soft)" }}>{l.wordMeaning}</p>
+        <p className="text-[12px] italic" style={{ color: "var(--ink-soft)" }}>{l.wordEx}</p>
+      </GildedCard>
     </div>
   );
 }

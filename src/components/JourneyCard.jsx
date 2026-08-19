@@ -1,19 +1,17 @@
 import ProgressBar from "./ProgressBar";
+import GildedCard from "./GildedCard";
 
 export default function JourneyCard() {
   return (
-    <div className="mx-5 mt-5 rounded-2xl bg-white border border-[#EDE6D6] p-4">
+    <GildedCard className="mx-5 mt-5 p-5">
       <div className="flex items-center justify-between mb-1">
-        <p className="text-[12px] font-semibold text-[#8A8478] uppercase tracking-wide">
+        <p className="text-[10px] font-semibold uppercase" style={{ color: "var(--ink-soft)", letterSpacing: "0.14em" }}>
           Your journey
         </p>
-        <span className="text-[12px] font-semibold text-[#C1622D]">Level 4</span>
+        <span className="text-[11px] font-semibold" style={{ color: "var(--gold)" }}>Level 4</span>
       </div>
-      <p className="font-display text-[15px] text-[#22231F] mb-2">
-        Everyday Conversations
-      </p>
+      <p className="font-display text-[15px] mb-3" style={{ color: "var(--ink)" }}>Everyday Conversations</p>
       <ProgressBar pct={78} />
-      <p className="text-[11px] text-[#8A8478] mt-1.5">78% · Explore Culture →</p>
-    </div>
+    </GildedCard>
   );
 }

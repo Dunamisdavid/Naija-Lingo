@@ -1,31 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import BottomNav from "@/components/BottomNav";
 import LanguageSelector from "@/components/LanguageSelector";
+import WelcomeScreen from "@/components/screens/WelcomeScreen";
 import HomeScreen from "@/components/screens/HomeScreen";
 import LearnScreen from "@/components/screens/LearnScreen";
 import SpeakScreen from "@/components/screens/SpeakScreen";
 import CultureScreen from "@/components/screens/CultureScreen";
 import ProfileScreen from "@/components/screens/ProfileScreen";
+import { useTheme } from "@/hooks/useTheme";
+import { Sun, Moon } from "lucide-react";
 
 export default function Home() {
+  const { status } = useSession();
   const [activeTab, setActiveTab] = useState("home");
   const [lang, setLang] = useState("yo");
+  const [showWelcome, setShowWelcome] = useState(null);
+  const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "authenticated") {
+      localStorage.setItem("nl_visited", "true");
+      setShowWelcome(false);
+      return;
+    }
+
+    const seen = localStorage.getItem("nl_visited");
+    setShowWelcome(!seen);
+  }, [status]);
+
+  const dismissWelcome = () => {
+    localStorage.setItem("nl_visited", "true");
+    setShowWelcome(false);
+  };
+
+  if (showWelcome === null) {
+    return <div className="min-h-screen bg-[#FAF3E7]" />;
+  }
+
+  if (showWelcome) {
+    return <WelcomeScreen onSkip={dismissWelcome} />;
+  }
 
   return (
-    <main className="min-h-screen w-full max-w-[430px] mx-auto bg-[#FAF3E7] pb-20 overflow-x-hidden">
-  <LanguageSelector lang={lang} onLangChange={setLang} />
+    <main className="min-h-screen w-full max-w-[430px] mx-auto pb-24 overflow-x-hidden" style={{ background: "var(--canvas)" }}>
+      <div className="flex items-center px-5 pt-1">
+        <LanguageSelector lang={lang} onLangChange={setLang} />
+        <button
+          onClick={toggleTheme}
+          className="ml-auto p-2 rounded-full transition-opacity hover:opacity-70"
+          style={{ color: "var(--gold)" }}
+        >
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+      </div>
 
-  <div key={activeTab} className="screen-enter">
-    {activeTab === "home" && <HomeScreen lang={lang} />}
-    {activeTab === "learn" && <LearnScreen lang={lang} />}
-    {activeTab === "speak" && <SpeakScreen lang={lang} />}
-    {activeTab === "culture" && <CultureScreen lang={lang} />}
-    {activeTab === "profile" && <ProfileScreen lang={lang} />}
-  </div>
+      <div key={activeTab} className="screen-enter">
+        {activeTab === "home" && <HomeScreen lang={lang} />}
+        {activeTab === "learn" && <LearnScreen lang={lang} />}
+        {activeTab === "speak" && <SpeakScreen lang={lang} />}
+        {activeTab === "culture" && <CultureScreen lang={lang} />}
+        {activeTab === "profile" && <ProfileScreen lang={lang} />}
+      </div>
 
-  <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
-</main>
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+    </main>
   );
 }

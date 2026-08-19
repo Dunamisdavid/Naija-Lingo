@@ -1,4 +1,5 @@
 import "./globals.css";
+import AuthProvider from "@/components/SessionProvider";
 
 export const metadata = {
   title: "Naija Lingo",
@@ -19,7 +20,9 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

@@ -32,7 +32,7 @@ export default function ListenButton({ text, language, accent = "#C1622D", label
     <button
       onClick={handlePlay}
       disabled={loading}
-      className="flex items-center gap-1.5 text-[12px] font-medium disabled:opacity-50"
+      className="flex items-center gap-1.5 text-[12px] font-medium disabled:opacity-50 transition-all duration-150 hover:opacity-70"
       style={{ color: accent }}
     >
       {loading ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />}

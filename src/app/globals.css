@@ -1,19 +1,34 @@
 @import "tailwindcss";
 
+:root {
+  --canvas: #F6F1E7;
+  --surface: #FFFFFF;
+  --surface-raised: #FBF8F2;
+  --ink: #1C1B17;
+  --ink-soft: #6B6455;
+  --gold: #9C7A3F;
+  --emerald: #1B3B2F;
+  --border: #E4DCC8;
+}
+
+.dark {
+  --canvas: #14140F;
+  --surface: #1C1C16;
+  --surface-raised: #22221A;
+  --ink: #F6F1E7;
+  --ink-soft: #B5AD98;
+  --gold: #C9A566;
+  --emerald: #2A5544;
+  --border: #34342A;
+}
+
 body {
   font-family: 'Inter', sans-serif;
-  background: #EDE6D6;
+  background: var(--canvas);
+  color: var(--ink);
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .font-display {
   font-family: 'Fraunces', serif;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.screen-enter {
-  animation: fadeIn 0.25s ease-out;
 }

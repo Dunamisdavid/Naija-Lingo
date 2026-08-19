@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Mic, Check, AlertCircle } from "lucide-react";
 import { LANGS } from "@/data/languages";
 import ListenButton from "@/components/ListenButton";
+import GildedCard from "@/components/GildedCard";
 
 export default function LearnScreen({ lang }) {
   const l = LANGS[lang];
@@ -43,12 +44,12 @@ export default function LearnScreen({ lang }) {
   if (error) {
     return (
       <div className="px-5 pt-10 flex flex-col items-center text-center">
-        <AlertCircle size={28} className="text-[#B4483B] mb-3" />
-        <p className="text-[13px] text-[#5C5648] mb-4">{error}</p>
+        <AlertCircle size={26} style={{ color: "#B4483B" }} className="mb-3" />
+        <p className="text-[13px] mb-4" style={{ color: "var(--ink-soft)" }}>{error}</p>
         <button
           onClick={loadLessons}
-          className="px-4 py-2 rounded-xl text-white text-[13px] font-semibold"
-          style={{ background: l.accent }}
+          className="px-4 py-2 text-[12px] font-semibold uppercase transition-all hover:opacity-80"
+          style={{ background: "var(--gold)", color: "var(--canvas)", letterSpacing: "0.08em" }}
         >
           Try again
         </button>
@@ -59,36 +60,38 @@ export default function LearnScreen({ lang }) {
   if (!lesson) {
     return (
       <div className="px-5 pt-6 space-y-4">
-        <div className="h-4 w-40 rounded bg-[#EDE6D6] animate-pulse" />
-        <div className="rounded-[22px] bg-white border border-[#EDE6D6] p-5 space-y-4">
-          <div className="h-4 w-full rounded bg-[#EDE6D6] animate-pulse" />
-          <div className="h-14 w-full rounded-2xl bg-[#EDE6D6] animate-pulse" />
-          <div className="h-4 w-32 rounded bg-[#EDE6D6] animate-pulse" />
+        <div className="h-3 w-40 animate-pulse" style={{ background: "var(--border)" }} />
+        <GildedCard className="p-5 space-y-4">
+          <div className="h-4 w-full animate-pulse" style={{ background: "var(--border)" }} />
+          <div className="h-14 w-full animate-pulse" style={{ background: "var(--border)" }} />
           <div className="space-y-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-11 w-full rounded-xl bg-[#EDE6D6] animate-pulse" />
+              <div key={i} className="h-11 w-full animate-pulse" style={{ background: "var(--border)" }} />
             ))}
           </div>
-        </div>
+        </GildedCard>
       </div>
     );
   }
 
   return (
     <div className="px-5 pt-4 space-y-4">
-      <p className="text-[12px] font-semibold uppercase tracking-wide text-[#8A8478]">
+      <p className="text-[10px] font-semibold uppercase" style={{ color: "var(--ink-soft)", letterSpacing: "0.14em" }}>
         {lesson.sceneLabel}
       </p>
 
-      <div className="rounded-[22px] bg-white border border-[#EDE6D6] p-5 space-y-4">
-        <p className="text-[13px] text-[#5C5648] leading-relaxed">{lesson.context}</p>
+      <GildedCard className="p-5 space-y-4">
+        <p className="text-[13px] leading-relaxed" style={{ color: "var(--ink-soft)" }}>{lesson.context}</p>
 
-<div className="rounded-2xl px-4 py-3.5 flex items-center justify-between" style={{ background: l.accentSoft }}>
-  <p className="font-display text-[20px] text-[#22231F]">"{lesson.phrase}."</p>
-  <ListenButton text={lesson.phrase} language={lang} accent={l.accent} label="" />
-</div>
+        <div
+          className="px-4 py-3.5 flex items-center justify-between"
+          style={{ background: "var(--canvas)", border: "1px solid var(--border)" }}
+        >
+          <p className="font-display text-[19px] italic" style={{ color: "var(--ink)" }}>"{lesson.phrase}"</p>
+          <ListenButton text={lesson.phrase} language={lang} accent="var(--gold)" label="" />
+        </div>
 
-        <p className="text-[13px] font-semibold text-[#22231F]">{lesson.question}</p>
+        <p className="text-[13px] font-semibold" style={{ color: "var(--ink)" }}>{lesson.question}</p>
 
         <div className="space-y-2">
           {lesson.options.map((opt, i) => {
@@ -99,44 +102,45 @@ export default function LearnScreen({ lang }) {
               <button
                 key={i}
                 onClick={() => setAnswered(i)}
-                className="w-full text-left px-4 py-3 rounded-xl border text-[13px] font-medium flex items-center justify-between"
+                className="w-full text-left px-4 py-3 text-[13px] font-medium flex items-center justify-between transition-all duration-150 hover:-translate-y-0.5"
                 style={{
-                  borderColor: isChosen ? (isCorrect ? "#1F4D3A" : "#B4483B") : "#EDE6D6",
-                  background: isChosen ? (isCorrect ? "#EAF2ED" : "#FBEAE8") : "#FAF8F3",
+                  border: `1px solid ${isChosen ? (isCorrect ? "var(--emerald)" : "#B4483B") : "var(--border)"}`,
+                  background: isChosen ? (isCorrect ? "rgba(27,59,47,0.08)" : "rgba(180,72,59,0.08)") : "var(--surface)",
+                  color: "var(--ink)",
                 }}
               >
                 {opt}
-                {isChosen && isCorrect && <Check size={16} color="#1F4D3A" />}
+                {isChosen && isCorrect && <Check size={16} style={{ color: "var(--emerald)" }} />}
               </button>
             );
           })}
         </div>
-      </div>
+      </GildedCard>
 
-            {answered === lesson.correctIndex && (
-        <div className="rounded-2xl p-4 border" style={{ borderColor: l.accent, background: l.accentSoft }}>
-          <p className="text-[12px] font-semibold uppercase tracking-wide mb-1" style={{ color: l.accent }}>
+      {answered === lesson.correctIndex && (
+        <GildedCard className="p-4" style={{ background: "var(--emerald)" }}>
+          <p className="text-[10px] font-semibold uppercase mb-1" style={{ color: "var(--gold)", letterSpacing: "0.14em" }}>
             Your turn
           </p>
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: l.accent }}>
-              <Mic size={18} color="white" />
+            <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ border: "1px solid var(--gold)" }}>
+              <Mic size={18} style={{ color: "var(--gold)" }} />
             </div>
-            <p className="text-[13px] text-[#22231F]">
-              Say: <span className="font-display font-semibold">"{lesson.phrase}."</span>
+            <p className="text-[13px]" style={{ color: "var(--canvas)" }}>
+              Say: <span className="font-display italic font-semibold">"{lesson.phrase}"</span>
             </p>
           </div>
 
           {index < lessons.length - 1 && (
             <button
               onClick={handleNext}
-              className="w-full mt-4 py-3 rounded-xl text-white text-[13px] font-semibold"
-              style={{ background: "#1F4D3A" }}
+              className="w-full mt-4 py-3 text-[12px] font-semibold uppercase transition-all hover:opacity-90"
+              style={{ background: "var(--gold)", color: "var(--emerald)", letterSpacing: "0.08em" }}
             >
               Next lesson
             </button>
           )}
-        </div>
+        </GildedCard>
       )}
     </div>
   );

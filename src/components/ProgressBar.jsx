@@ -11,10 +11,10 @@ export default function ProgressBar({ pct }) {
   }, [pct]);
 
   return (
-    <div className="w-full h-1.5 rounded-full overflow-hidden bg-white/20">
+    <div className="w-full h-[1px]" style={{ background: "rgba(201,165,102,0.2)" }}>
       <div
-        className="h-full rounded-full bg-[#D4A24C] transition-all duration-700 ease-out"
-        style={{ width: `${width}%` }}
+        className="h-full transition-all duration-700 ease-out"
+        style={{ width: `${width}%`, background: "var(--gold)" }}
       />
     </div>
   );
