@@ -8,12 +8,7 @@ export default function WelcomeScreen({ onSkip }) {
       className="min-h-screen w-full flex flex-col items-center justify-center px-8 text-center"
       style={{ background: "var(--canvas)" }}
     >
-      <div
-        className="w-14 h-14 rounded-full flex items-center justify-center mb-6"
-        style={{ border: "1px solid var(--gold)", boxShadow: "inset 0 0 12px rgba(184,147,90,0.08)" }}
-      >
-        <span className="font-display text-[15px]" style={{ color: "var(--gold)", letterSpacing: "0.05em" }}>NL</span>
-      </div>
+      <img src="/logo.svg" alt="Naija Lingo" className="w-20 h-20 mb-6" />
 
       <p className="font-display text-[26px] mb-3" style={{ color: "var(--ink)" }}>Naija Lingo</p>
       <p className="text-[13px] leading-relaxed mb-10 max-w-[260px]" style={{ color: "var(--ink-soft)" }}>
