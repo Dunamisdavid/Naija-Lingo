@@ -3,10 +3,22 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 import { LANGS } from "@/data/languages";
 import GildedCard from "@/components/GildedCard";
+import { useState, useEffect } from "react";
+import { computeStreak } from "@/lib/streak";
+import { getCurrentUnitProgress } from "@/lib/levelProgress";
 
-export default function ProfileScreen({ lang }) {
+export default function ProfileScreen({ lang, onLangChange }) {
   const l = LANGS[lang];
   const { data: session, status } = useSession();
+
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    if (!session) return;
+    fetch("/api/progress")
+      .then((res) => res.json())
+      .then((data) => setStats(data));
+  }, [session]);
 
   if (status === "loading") {
     return (
@@ -16,10 +28,24 @@ export default function ProfileScreen({ lang }) {
     );
   }
 
+  const [levelInfo, setLevelInfo] = useState(null);
+
+  useEffect(() => {
+    if (!session) return;
+    Promise.all([
+      fetch("/api/progress").then((res) => res.json()),
+      fetch(`/api/units?lang=${lang}`).then((res) => res.json()),
+    ]).then(([progressData, units]) => {
+      setStats(progressData);
+      const completedIds = new Set(progressData.map((p) => p.lessonId));
+      setLevelInfo(getCurrentUnitProgress(units, completedIds));
+    });
+  }, [session, lang]);
+
   if (!session) {
-    return (
-      <div className="px-5 pt-10 flex flex-col items-center text-center">
-        <p className="font-display text-[19px] mb-2" style={{ color: "var(--ink)" }}>Save your progress</p>
+  return (
+    <div className="px-5 pt-10 flex flex-col items-center text-center">
+      <p className="font-display text-[19px] mb-2" style={{ color: "var(--ink)" }}>Save your progress</p>
         <p className="text-[13px] mb-6" style={{ color: "var(--ink-soft)" }}>
           Sign in to keep your streak, words learned, and lessons across devices.
         </p>
@@ -42,7 +68,9 @@ export default function ProfileScreen({ lang }) {
         )}
         <div>
           <h2 className="font-display text-[19px]" style={{ color: "var(--ink)" }}>{session.user.name}</h2>
-          <p className="text-[13px]" style={{ color: "var(--ink-soft)" }}>{l.label} · Level 8</p>
+          <p className="text-[13px]" style={{ color: "var(--ink-soft)" }}>
+            {l.label} · {levelInfo ? `Level ${levelInfo.level}` : "Level —"}
+          </p>
         </div>
       </div>
 
@@ -51,13 +79,17 @@ export default function ProfileScreen({ lang }) {
           <p className="text-[10px] font-semibold uppercase mb-1" style={{ color: "var(--ink-soft)", letterSpacing: "0.1em" }}>
             Words learned
           </p>
-          <p className="font-display text-[22px]" style={{ color: "var(--ink)" }}>482</p>
+          <p className="font-display text-[22px]" style={{ color: "var(--ink)" }}>
+            {stats ? stats.length : "—"}
+          </p>
         </GildedCard>
         <GildedCard className="p-4">
           <p className="text-[10px] font-semibold uppercase mb-1" style={{ color: "var(--ink-soft)", letterSpacing: "0.1em" }}>
             Streak
           </p>
-          <p className="font-display text-[22px]" style={{ color: "var(--ink)" }}>14 days</p>
+          <p className="font-display text-[22px]" style={{ color: "var(--ink)" }}>
+            {stats ? `${computeStreak(stats)} days` : "—"}
+          </p>
         </GildedCard>
       </div>
 
@@ -69,6 +101,31 @@ export default function ProfileScreen({ lang }) {
           Let's work on pronunciation — you're at 73%, up from 61% last week.
         </p>
       </GildedCard>
+
+        <div>
+          <p className="text-[10px] font-semibold uppercase mb-2" style={{ color: "var(--ink-soft)", letterSpacing: "0.1em" }}>
+            Focus language
+          </p>
+          <div className="flex gap-2">
+            {Object.keys(LANGS).map((key) => (
+              <button
+                key={key}
+                onClick={() => {
+                  onLangChange(key);
+                  localStorage.setItem("nl_primary_lang", key);
+                }}
+                className="px-3 py-1.5 text-[11px] font-semibold transition-all"
+                style={{
+                  border: `1px solid ${lang === key ? "var(--gold)" : "var(--border)"}`,
+                  background: lang === key ? "var(--gold)" : "transparent",
+                  color: lang === key ? "var(--canvas)" : "var(--ink-soft)",
+                }}
+              >
+                {LANGS[key].label}
+              </button>
+            ))}
+          </div>
+        </div>
 
       <button
         onClick={() => signOut()}

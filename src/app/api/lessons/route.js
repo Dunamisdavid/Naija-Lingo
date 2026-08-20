@@ -4,10 +4,15 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const lang = searchParams.get("lang") || "yo";
+  const unitId = searchParams.get("unitId");
 
   try {
     const lessons = await prisma.lesson.findMany({
-      where: { language: lang },
+      where: {
+        language: lang,
+        published: true,
+        ...(unitId && { unitId }),
+      },
       orderBy: { order: "asc" },
     });
     return NextResponse.json(lessons);
