@@ -510,7 +510,7 @@ function UsersManager() {
           className="border p-2 rounded flex-1 min-w-[140px]"
         />
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="border p-2 rounded">
-          <option value="lastActive">Sort: Last active</option>
+          <option value="lastActive">Sort : Last active</option>
           <option value="totalCompleted">Sort: Most lessons</option>
           <option value="streak">Sort: Longest streak</option>
           <option value="joined">Sort: Newest members</option>
