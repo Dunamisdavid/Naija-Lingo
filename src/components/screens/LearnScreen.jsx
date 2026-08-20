@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Mic, Square, Check, AlertCircle, ChevronRight, Sparkles } from "lucide-react";
+import { Mic, Square, Check, AlertCircle, ChevronRight, Sparkles, PartyPopper } from "lucide-react";
 import { LANGS } from "@/data/languages";
 import ListenButton from "@/components/ListenButton";
 import GildedCard from "@/components/GildedCard";
@@ -26,6 +26,7 @@ export default function LearnScreen({ lang }) {
   const [unit, setUnit] = useState(null);
   const [lessons, setLessons] = useState(null);
   const [lesson, setLesson] = useState(null);
+  const [unitComplete, setUnitComplete] = useState(false);
   const [error, setError] = useState(null);
 
   // "present" (first-time teaching) -> "recognize" (multiple choice) -> "produce" (speak it)
@@ -46,6 +47,7 @@ export default function LearnScreen({ lang }) {
   const loadLessons = async () => {
     setLessons(null);
     setLesson(null);
+    setUnitComplete(false);
     setError(null);
     setAnswered(null);
     setStage("present");
@@ -58,21 +60,34 @@ export default function LearnScreen({ lang }) {
       const lessonsData = await lessonsRes.json();
       setLessons(lessonsData);
 
-      let picked;
-      let hasSeenBefore = false;
+      if (lessonsData.length === 0) {
+        return;
+      }
 
       if (session) {
         const progressRes = await fetch("/api/progress");
         const progressData = await progressRes.json();
-        picked = pickNextLesson(lessonsData, progressData);
-        hasSeenBefore = picked ? progressData.some((p) => p.lessonId === picked.id) : false;
-      } else {
-        picked = lessonsData.find((les) => !guestCompleted.has(les.id)) || null;
-        hasSeenBefore = false;
-      }
+        const completedIds = new Set(progressData.map((p) => p.lessonId));
+        const allAttempted = lessonsData.every((les) => completedIds.has(les.id));
 
-      setLesson(picked);
-      setStage(hasSeenBefore ? "recognize" : "present");
+        if (allAttempted) {
+          setUnitComplete(true);
+          return;
+        }
+
+        const picked = pickNextLesson(lessonsData, progressData);
+        const hasSeenBefore = picked ? progressData.some((p) => p.lessonId === picked.id) : false;
+        setLesson(picked);
+        setStage(hasSeenBefore ? "recognize" : "present");
+      } else {
+        const picked = lessonsData.find((les) => !guestCompleted.has(les.id));
+        if (!picked) {
+          setUnitComplete(true);
+          return;
+        }
+        setLesson(picked);
+        setStage("present");
+      }
     } catch {
       setError("We couldn't load lessons. Check your connection and try again.");
     }
@@ -202,16 +217,26 @@ export default function LearnScreen({ lang }) {
     );
   }
 
-  // Lessons loaded, but genuinely nothing left to serve (guest finished the whole unit)
-  if (!lesson && lessons.length > 0 && !session) {
+  // Real completion moment — every lesson in this unit has been passed
+  if (unitComplete) {
     return (
       <div className="px-6 pt-16 flex flex-col items-center text-center">
-        <p className="font-display text-[17px] mb-2" style={{ color: "var(--ink)" }}>
-          Nice work — you've tried every phrase in this unit!
+        <PartyPopper size={30} style={{ color: "var(--gold)" }} className="mb-4" />
+        <p className="font-display text-[20px] mb-2" style={{ color: "var(--ink)" }}>
+          Unit complete!
         </p>
-        <p className="text-[13px]" style={{ color: "var(--ink-soft)" }}>
-          Sign in to save your progress and keep going with spaced review.
+        <p className="text-[13px] mb-8" style={{ color: "var(--ink-soft)" }}>
+          {session
+            ? "You've spoken every phrase in this unit. It'll come back for review in Speak when it's due — for now, pick your next unit."
+            : "You've tried every phrase in this unit. Sign in to save this progress and unlock spaced review."}
         </p>
+        <button
+          onClick={() => setUnit(null)}
+          className="px-5 py-3 text-[12px] font-semibold uppercase transition-all hover:opacity-90"
+          style={{ background: "var(--gold)", color: "var(--canvas)", letterSpacing: "0.08em" }}
+        >
+          Choose next unit
+        </button>
       </div>
     );
   }
